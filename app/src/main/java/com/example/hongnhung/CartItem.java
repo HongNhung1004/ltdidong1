@@ -1,17 +1,41 @@
 package com.example.hongnhung;
-
 public class CartItem {
-    public int imageRes;
-    public String name;
-    public String description;
-    public int quantity;
-    public int price;
+    private String imageUrl;
+    private String name;
+    private String desc;
+    private int quantity;
+    private String price;
 
-    public CartItem(int imageRes, String name, String description, int quantity, int price) {
-        this.imageRes = imageRes;
+    public CartItem(String imageUrl, String name, String desc, int quantity, String price) {
+        this.imageUrl = imageUrl;
         this.name = name;
-        this.description = description;
+        this.desc = desc;
         this.quantity = quantity;
         this.price = price;
     }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getDesc() {
+        return desc;
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public String getPrice() {
+        return price;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
 }
+

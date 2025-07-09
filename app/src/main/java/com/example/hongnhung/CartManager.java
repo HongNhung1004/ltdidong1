@@ -1,6 +1,5 @@
 package com.example.hongnhung;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,8 +20,8 @@ public class CartManager {
 
     public void addItem(CartItem item) {
         for (CartItem existing : cartItems) {
-            if (existing.name.equals(item.name)) {
-                existing.quantity += item.quantity;
+            if (existing.getName().equals(item.getName())) {
+                existing.setQuantity(existing.getQuantity() + item.getQuantity());
                 return;
             }
         }
@@ -36,7 +35,7 @@ public class CartManager {
     public int getTotalQuantity() {
         int total = 0;
         for (CartItem item : cartItems) {
-            total += item.quantity;
+            total += item.getQuantity();
         }
         return total;
     }
@@ -45,4 +44,3 @@ public class CartManager {
         cartItems.clear();
     }
 }
-

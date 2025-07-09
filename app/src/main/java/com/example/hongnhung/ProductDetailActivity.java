@@ -1,123 +1,99 @@
+
 package com.example.hongnhung;
 
 import android.content.Intent;
+import android.graphics.Paint;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.Toast;
-import android.graphics.Paint;
+import android.widget.*;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
+
+import com.squareup.picasso.Picasso;
 
 public class ProductDetailActivity extends AppCompatActivity {
 
-    ImageView imgProduct;
-    TextView tvProductName, tvProductDesc, tvProductPrice,tvProductPriceSale;
-    Button btnBuyNow;
+    ImageView imgProduct, cartIcon;
+    TextView tvProductName, tvProductDesc, tvOriginalPrice, tvSalePrice, tvCartCount;
+    EditText etSearch;
+    Button btnBuyNow, btnAddToCart;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_product_detail);
 
+        // Ánh xạ view
         imgProduct = findViewById(R.id.imgProduct);
         tvProductName = findViewById(R.id.tvProductName);
         tvProductDesc = findViewById(R.id.tvProductDesc);
-        tvProductPrice = findViewById(R.id.tvOriginalPrice);
-        tvProductPriceSale = findViewById(R.id.tvSalePrice);
-
-
+        tvOriginalPrice = findViewById(R.id.tvOriginalPrice);
+        tvSalePrice = findViewById(R.id.tvSalePrice);
+        tvCartCount = findViewById(R.id.tvCartCount);
+        etSearch = findViewById(R.id.etSearch);
         btnBuyNow = findViewById(R.id.btnBuyNow);
+        btnAddToCart = findViewById(R.id.btnAddToCart);
+        cartIcon = findViewById(R.id.cartIcon);
         ImageButton btnBack = findViewById(R.id.btnBack);
-        btnBack.setOnClickListener(v -> {
-            Intent intent = new Intent(ProductDetailActivity.this, HomeActivity.class);
-            startActivity(intent);
-            // kết thúc CheckoutActivity
-        });
+
+        // Nhận dữ liệu
         Intent intent = getIntent();
         String name = intent.getStringExtra("name");
         String desc = intent.getStringExtra("desc");
         String price = intent.getStringExtra("price");
         String pricesale = intent.getStringExtra("pricesale");
-        int imageRes = intent.getIntExtra("image", R.drawable.banner_sample);
+        String imageUrl = intent.getStringExtra("imageUrl");
 
+        // Hiển thị dữ liệu
         tvProductName.setText(name);
         tvProductDesc.setText(desc);
-        TextView tvOriginalPrice = findViewById(R.id.tvOriginalPrice);
+        tvOriginalPrice.setText(price);
         tvOriginalPrice.setPaintFlags(tvOriginalPrice.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+        tvSalePrice.setText(pricesale);
+        Picasso.get().load(imageUrl).into(imgProduct);
 
-        imgProduct.setImageResource(imageRes);
+        // Sự kiện back
+        btnBack.setOnClickListener(v -> finish());
+
+        // Mua ngay
         btnBuyNow.setOnClickListener(v -> {
             Intent checkoutIntent = new Intent(ProductDetailActivity.this, CheckoutActivity.class);
             checkoutIntent.putExtra("name", name);
             checkoutIntent.putExtra("desc", desc);
-            checkoutIntent.putExtra("price", Integer.parseInt(pricesale.replace(".", "").replace("đ", "").trim())); // Lấy giá giảm
+            checkoutIntent.putExtra("price", pricesale);
             checkoutIntent.putExtra("quantity", 1);
-            checkoutIntent.putExtra("image", imageRes);
-            checkoutIntent.putExtra("address", "Chưa nhập");
+            checkoutIntent.putExtra("imageUrl", imageUrl);
             startActivity(checkoutIntent);
         });
 
-
-        Toast.makeText(this, "Mua " + name, Toast.LENGTH_SHORT).show();
-
-        TextView tvCartCount = findViewById(R.id.tvCartCount);
-        int cartCount = CartManager.getInstance().getTotalQuantity();
-        if (cartCount > 0) {
-            tvCartCount.setVisibility(View.VISIBLE);
-            tvCartCount.setText(String.valueOf(cartCount));
-        } else {
-            tvCartCount.setVisibility(View.GONE);
-        }
-
-        ImageView cartIcon = findViewById(R.id.cartIcon);
-        cartIcon.setOnClickListener(v -> {
-            Intent Cartintent = new Intent(ProductDetailActivity.this, CartActivity.class);
-            startActivity(Cartintent);
-        });
-        EditText etSearch = findViewById(R.id.etSearch);
+        // Tìm kiếm
         etSearch.setOnEditorActionListener((textView, actionId, keyEvent) -> {
             String query = textView.getText().toString();
             Toast.makeText(this, "Tìm kiếm: " + query, Toast.LENGTH_SHORT).show();
             return true;
         });
 
-
-        Button btnAddToCart = findViewById(R.id.btnAddToCart);
+        // Thêm vào giỏ hàng
         btnAddToCart.setOnClickListener(v -> {
-            CartItem item = new CartItem(imageRes, name, desc, 1,
-                    Integer.parseInt(pricesale.replace(".", "").replace("đ", "").trim()));
+            CartItem item = new CartItem(imageUrl, name, desc, 1, pricesale);
             CartManager.getInstance().addItem(item);
             Toast.makeText(this, "Đã thêm vào giỏ hàng", Toast.LENGTH_SHORT).show();
-            finish(); // quay lại HomeActivity
+            updateCartBadge();
         });
 
+        // Giỏ hàng
+        cartIcon.setOnClickListener(v -> startActivity(new Intent(this, CartActivity.class)));
 
-        btnAddToCart.setOnClickListener(v -> {
-            // Thêm vào CartManager
-            CartItem item = new CartItem(imageRes, name, desc, 1, Integer.parseInt(pricesale.replace(".", "").replace("đ", "").trim()));
-            CartManager.getInstance().addItem(item);
+        updateCartBadge();
+    }
 
-            // Hiển thị thông báo
-            Toast.makeText(this, "Đã thêm vào giỏ hàng", Toast.LENGTH_SHORT).show();
-
-            // Cập nhật số lượng trên icon nếu có (nếu dùng TextView nhỏ hiển thị số)
-            TextView tvBadge = findViewById(R.id.tvCartCount);
-            if (tvBadge != null) {
-                int count = CartManager.getInstance().getTotalQuantity();
-                tvBadge.setText(String.valueOf(count));
-                tvBadge.setVisibility(View.VISIBLE);
-            }
-        });
-
-
+    private void updateCartBadge() {
+        int count = CartManager.getInstance().getTotalQuantity();
+        if (count > 0) {
+            tvCartCount.setVisibility(View.VISIBLE);
+            tvCartCount.setText(String.valueOf(count));
+        } else {
+            tvCartCount.setVisibility(View.GONE);
+        }
     }
 }

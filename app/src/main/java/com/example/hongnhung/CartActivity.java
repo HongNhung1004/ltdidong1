@@ -1,5 +1,5 @@
-package com.example.hongnhung;
 
+package com.example.hongnhung;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -42,21 +42,24 @@ public class CartActivity extends AppCompatActivity {
         tvTotal = findViewById(R.id.tvTotal);
         btnCheckout = findViewById(R.id.btnCheckout);
         ImageButton btnBackDetail = findViewById(R.id.btnBackDetail);
+
+        // Lấy giỏ hàng
+        cartItems = CartManager.getInstance().getCartItems();
+
+        // Trở về trang chi tiết sản phẩm đầu tiên
         btnBackDetail.setOnClickListener(v -> {
-            Intent intent = new Intent(CartActivity.this, ProductDetailActivity.class);
-
-
-            intent.putExtra("name", cartItems.get(0).name);
-            intent.putExtra("desc", cartItems.get(0).description);
-            intent.putExtra("price", cartItems.get(0).price);
-            intent.putExtra("image", cartItems.get(0).imageRes);
-
-            startActivity(intent);
-            finish(); // kết thúc CartActivity
+            if (!cartItems.isEmpty()) {
+                CartItem item = cartItems.get(0);
+                Intent intent = new Intent(CartActivity.this, ProductDetailActivity.class);
+                intent.putExtra("name", item.getName());
+                intent.putExtra("desc", item.getDesc());
+                intent.putExtra("price", item.getPrice()); // giá gốc
+                intent.putExtra("pricesale", item.getPrice()); // giá sale (giống giá gốc nếu chưa có khác biệt)
+                intent.putExtra("imageUrl", item.getImageUrl());
+                startActivity(intent);
+                finish();
+            }
         });
-
-
-        cartItems = CartManager.getInstance().getCartItems(); // ✅ đúng
 
 
         // Adapter
@@ -66,28 +69,34 @@ public class CartActivity extends AppCompatActivity {
 
         updateSummary();
 
-        // Nút thanh toán
+        // Thanh toán
         btnCheckout.setOnClickListener(v -> {
             if (!cartItems.isEmpty()) {
-                CartItem item = cartItems.get(0); // lấy sản phẩm đầu tiên (hoặc có thể gửi danh sách)
+                CartItem item = cartItems.get(0);
                 Intent checkoutIntent = new Intent(CartActivity.this, CheckoutActivity.class);
-                checkoutIntent.putExtra("name", item.name);
-                checkoutIntent.putExtra("desc", item.description);
-                checkoutIntent.putExtra("price", item.price);
-                checkoutIntent.putExtra("quantity", item.quantity);
-                checkoutIntent.putExtra("image", item.imageRes);
+                checkoutIntent.putExtra("name", item.getName());
+                checkoutIntent.putExtra("desc", item.getDesc());
+                checkoutIntent.putExtra("price", item.getPrice());
+                checkoutIntent.putExtra("quantity", item.getQuantity());
+                checkoutIntent.putExtra("imageUrl", item.getImageUrl());
                 checkoutIntent.putExtra("address", etAddress.getText().toString());
                 startActivity(checkoutIntent);
             } else {
                 Toast.makeText(this, "Giỏ hàng trống!", Toast.LENGTH_SHORT).show();
             }
         });
+
     }
 
     private void updateSummary() {
         int subtotal = 0;
         for (CartItem item : cartItems) {
-            subtotal += item.price * item.quantity;
+            try {
+                int priceInt = Integer.parseInt(item.getPrice().replace("đ", "").replace(".", "").trim());
+                subtotal += priceInt * item.getQuantity();
+            } catch (NumberFormatException e) {
+                e.printStackTrace();
+            }
         }
 
         tvSubtotal.setText("Tạm tính: " + subtotal + "đ");
@@ -95,4 +104,5 @@ public class CartActivity extends AppCompatActivity {
         tvDiscount.setText("Giảm giá: " + DISCOUNT + "đ");
         tvTotal.setText("Tổng cộng: " + (subtotal + SHIPPING_FEE - DISCOUNT) + "đ");
     }
+
 }

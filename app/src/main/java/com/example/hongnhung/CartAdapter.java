@@ -1,3 +1,4 @@
+
 package com.example.hongnhung;
 
 import android.content.Context;
@@ -9,6 +10,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -55,22 +58,24 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
     public void onBindViewHolder(CartViewHolder holder, int position) {
         CartItem item = cartItems.get(position);
 
-        holder.imgProduct.setImageResource(item.imageRes);
-        holder.tvName.setText(item.name);
-        holder.tvDesc.setText(item.description);
-        holder.tvPrice.setText(item.price + "đ");
-        holder.tvQuantity.setText(String.valueOf(item.quantity));
+        // Load ảnh bằng URL
+        Picasso.get().load(item.getImageUrl()).into(holder.imgProduct);
+
+        holder.tvName.setText(item.getName());
+        holder.tvDesc.setText(item.getDesc());
+        holder.tvPrice.setText(item.getPrice() + "đ");
+        holder.tvQuantity.setText(String.valueOf(item.getQuantity()));
 
         holder.btnMinus.setOnClickListener(v -> {
-            if (item.quantity > 1) {
-                item.quantity--;
+            if (item.getQuantity() > 1) {
+                item.setQuantity(item.getQuantity() - 1);
                 notifyItemChanged(position);
                 listener.onQuantityChanged();
             }
         });
 
         holder.btnPlus.setOnClickListener(v -> {
-            item.quantity++;
+            item.setQuantity(item.getQuantity() + 1);
             notifyItemChanged(position);
             listener.onQuantityChanged();
         });

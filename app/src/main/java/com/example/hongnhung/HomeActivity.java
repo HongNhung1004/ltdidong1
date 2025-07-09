@@ -1,29 +1,49 @@
+
 package com.example.hongnhung;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class HomeActivity extends AppCompatActivity {
-    ImageView btnProfile;
-    TextView tvCartCount;
+
+    private ImageView btnProfile, cartIcon;
+    private TextView tvCartCount;
+    private EditText etSearch;
+    private RecyclerView recyclerView;
+    private List<products> sanPhamList;
+    private productAdapter productAdapter;
+
+    private final String url = "https://fakestoreapi.com/products";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_home);
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
@@ -32,63 +52,63 @@ public class HomeActivity extends AppCompatActivity {
             return insets;
         });
 
+        // Khởi tạo danh sách
+        sanPhamList = new ArrayList<>();
+
+        // Ánh xạ View
         tvCartCount = findViewById(R.id.tvCartCount);
-
         btnProfile = findViewById(R.id.btnProfile);
+        cartIcon = findViewById(R.id.cartIcon);
+        etSearch = findViewById(R.id.etSearch);
+        recyclerView = findViewById(R.id.recyclerView);
 
-        btnProfile.setOnClickListener(v -> {
-            Intent intent = new Intent(HomeActivity.this, ProfileActivity.class);
-            startActivity(intent);
-        });
-        ImageView ivCartIcon = findViewById(R.id.cartIcon);
-       ivCartIcon.setOnClickListener(v -> {
-            Intent intent = new Intent(HomeActivity.this, CartActivity.class);
-           startActivity(intent);
-      });
+        // Khởi tạo RecyclerView
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        productAdapter = new productAdapter(this, sanPhamList);
+        recyclerView.setAdapter(productAdapter);
 
-        EditText etSearch = findViewById(R.id.etSearch);
+        // Gọi API để lấy dữ liệu sản phẩm
+        loadSanPham();
+
+        // Xử lý tìm kiếm
         etSearch.setOnEditorActionListener((v, actionId, event) -> {
             String query = etSearch.getText().toString();
             Toast.makeText(this, "Đang tìm: " + query, Toast.LENGTH_SHORT).show();
             return true;
         });
 
-        // Danh sách sản phẩm
-        String[] names = {
-                "Áo thun nữ", "Váy mùa hè", "Mũ Thời Trang",
-                "Giày thể thao nữ", "Túi xách thời trang", "Quần jean", "Áo Polo Nam"
-        };
-        String[] descriptions = {
-                "Áo thun chất liệu cotton thoáng mát", "Váy mùa hè xinh xắn", "Mũ thời trang cá tính",
-                "Giày thể thao nữ siêu nhẹ", "Túi xách thời trang cao cấp", "Quần jean", "Áo polo nam siêu sang trọng"
-        };
-        String[] prices = {
-                "129.000đ", "249.000đ", "299.000đ", "499.000đ", "399.000đ", "59.000đ", "189.000đ"
-        };
-        String[] pricesale = {
-                "100.000đ", "200.000đ", "249.000đ", "405.000đ", "349.000đ", "45.000đ", "149.000đ"
-        };
-
-        int[] images = {
-                R.drawable.pants, R.drawable.dress, R.drawable.hat,
-                R.drawable.dress, R.drawable.bag, R.drawable.pants, R.drawable.tshirt
-        };
-
-        ListView listView = findViewById(R.id.categoryListView);
-        CategoryAdapter adapter = new CategoryAdapter(this, names, images);
-        listView.setAdapter(adapter);
-
-        listView.setOnItemClickListener((parent, view, position, id) -> {
-            Intent intent = new Intent(HomeActivity.this, ProductDetailActivity.class);
-            intent.putExtra("name", names[position]);
-            intent.putExtra("desc", descriptions[position]);
-            intent.putExtra("price", prices[position]);
-            intent.putExtra("pricesale", pricesale[position]);
-            intent.putExtra("image", images[position]);
-            startActivity(intent);
-        });
+        // Sự kiện chuyển trang
+        btnProfile.setOnClickListener(v -> startActivity(new Intent(this, ProfileActivity.class)));
+        cartIcon.setOnClickListener(v -> startActivity(new Intent(this, CartActivity.class)));
     }
 
+    private void loadSanPham() {
+        RequestQueue queue = Volley.newRequestQueue(this);
+
+        JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET, url, null,
+                response -> {
+                    sanPhamList.clear();
+                    for (int i = 0; i < response.length(); i++) {
+                        try {
+                            JSONObject obj = response.getJSONObject(i);
+                            products sp = new products(
+                                    obj.getInt("id"),
+                                    obj.getString("title"),
+                                    obj.getDouble("price"),
+                                    obj.getString("image")
+                            );
+                            sanPhamList.add(sp);
+                        } catch (JSONException e) {
+                            Log.e("JSON_ERROR", e.getMessage());
+                        }
+                    }
+                    productAdapter.notifyDataSetChanged();
+                },
+                error -> Log.e("API_ERROR", error.toString())
+        );
+
+        queue.add(request);
+    }
 
     @Override
     protected void onResume() {
@@ -97,14 +117,12 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void updateCartBadge() {
-        TextView badge = findViewById(R.id.tvCartCount);
         int count = CartManager.getInstance().getTotalQuantity();
         if (count > 0) {
-            badge.setVisibility(View.VISIBLE);
-            badge.setText(String.valueOf(count));
+            tvCartCount.setVisibility(View.VISIBLE);
+            tvCartCount.setText(String.valueOf(count));
         } else {
-            badge.setVisibility(View.GONE);
+            tvCartCount.setVisibility(View.GONE);
         }
     }
-
 }
