@@ -48,18 +48,9 @@ public class CartActivity extends AppCompatActivity {
 
         // Trở về trang chi tiết sản phẩm đầu tiên
         btnBackDetail.setOnClickListener(v -> {
-            if (!cartItems.isEmpty()) {
-                CartItem item = cartItems.get(0);
-                Intent intent = new Intent(CartActivity.this, ProductDetailActivity.class);
-                intent.putExtra("name", item.getName());
-                intent.putExtra("desc", item.getDesc());
-                intent.putExtra("price", item.getPrice()); // giá gốc
-                intent.putExtra("pricesale", item.getPrice()); // giá sale (giống giá gốc nếu chưa có khác biệt)
-                intent.putExtra("imageUrl", item.getImageUrl());
-                startActivity(intent);
-                finish();
-            }
+            finish(); // Luôn quay lại màn hình trước (ProductDetailActivity hoặc HomeActivity)
         });
+
 
 
         // Adapter

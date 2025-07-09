@@ -103,8 +103,11 @@ public class HomeActivity extends AppCompatActivity {
                         }
                     }
                     productAdapter.notifyDataSetChanged();
+                    Log.d("API", "Tổng số sản phẩm: " + sanPhamList.size());
+
                 },
                 error -> Log.e("API_ERROR", error.toString())
+
         );
 
         queue.add(request);
