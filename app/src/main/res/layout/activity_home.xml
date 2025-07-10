@@ -6,6 +6,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/white"
     tools:context=".HomeActivity">
 
     <!-- Header -->
@@ -18,72 +19,26 @@
         android:padding="16dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:weightSum="1">
+        app:layout_constraintEnd_toEndOf="parent">
 
-        <!-- Bên trái: Menu + Home -->
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.7"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
+        <TextView
+            android:text="🏬 HOME "
+            android:textSize="20sp"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
 
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_menu"
-                android:layout_marginEnd="8dp"/>
+        <ImageView
+            android:id="@+id/btnProfile"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@drawable/ic_account"
+            android:background="@drawable/rounded_circle"
+            android:padding="6dp"
+            android:contentDescription="Account" />
+        <!-- Cart icon -->
 
-            <TextView
-                android:text="Home"
-                android:textSize="24sp"
-                android:textStyle="bold"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-        </LinearLayout>
-
-        <!-- Bên phải: Giỏ hàng + Thông báo -->
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.3"
-            android:gravity="end"
-            android:orientation="horizontal">
-
-            <!-- FrameLayout chứa icon và số lượng -->
-            <FrameLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="12dp">
-
-                <ImageView
-                    android:id="@+id/cartIcon"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_cart"
-                    android:contentDescription="Cart" />
-
-                <TextView
-                    android:id="@+id/tvCartCount"
-                    android:layout_width="18dp"
-                    android:layout_height="18dp"
-                    android:layout_gravity="top|end"
-                    android:background="@drawable/badge_background"
-                    android:text="0"
-                    android:textColor="@android:color/white"
-                    android:textSize="10sp"
-                    android:gravity="center"
-                    android:visibility="gone"/>
-            </FrameLayout>
-
-            <ImageView
-                android:id="@+id/btnProfile"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_account"
-                android:contentDescription="Account" />
-        </LinearLayout>
     </LinearLayout>
 
     <!-- Search bar -->
@@ -91,10 +46,9 @@
         android:id="@+id/searchLayout"
         android:layout_width="0dp"
         android:layout_height="48dp"
-        android:background="@drawable/search_box"
+        android:background="@drawable/search_box_bg"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        android:layout_marginTop="8dp"
         app:layout_constraintTop_toBottomOf="@id/headerLayout"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
@@ -109,61 +63,70 @@
 
         <EditText
             android:id="@+id/etSearch"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_toEndOf="@id/searchIcon"
-            android:layout_toStartOf="@id/cameraIcon"
+            android:layout_toStartOf="@id/cartLayout"
             android:layout_alignParentTop="true"
             android:layout_alignParentBottom="true"
-            android:hint="Tìm kiếm..."
+            android:hint="Tìm sản phẩm..."
             android:background="@android:color/transparent"
             android:paddingStart="8dp"
             android:paddingEnd="8dp"
             android:textSize="14sp"
             android:inputType="text"
-            android:importantForAutofill="no"
-            android:singleLine="true"/>
+            android:singleLine="true"
+            android:focusable="true"
+            android:focusableInTouchMode="true" />
 
-        <ImageView
-            android:id="@+id/cameraIcon"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+        <FrameLayout
+            android:id="@+id/cartLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
-            android:layout_marginEnd="12dp"
-            android:src="@android:drawable/ic_menu_camera" />
+            android:layout_marginEnd="12dp">
+
+            <ImageView
+                android:id="@+id/cartIcon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_cart" />
+
+            <TextView
+                android:id="@+id/tvCartCount"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_gravity="top|end"
+                android:background="@drawable/badge_background"
+                android:text="0"
+                android:textColor="@android:color/white"
+                android:textSize="10sp"
+                android:gravity="center"
+                android:visibility="gone" />
+        </FrameLayout>
     </RelativeLayout>
 
-    <!-- Banner -->
+
+    <!-- Banner Image (nằm giữa search và recycler) -->
     <ImageView
         android:id="@+id/bannerImage"
         android:layout_width="0dp"
         android:layout_height="180dp"
         android:layout_marginTop="12dp"
         android:scaleType="centerCrop"
-        android:background="@drawable/rounded_corner"
         android:src="@drawable/banner_sample"
+        android:background="@drawable/rounded_corner"
         app:layout_constraintTop_toBottomOf="@id/searchLayout"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
-
-    <!-- ListView -->
-<!--    <ListView-->
-<!--        android:id="@+id/categoryListView"-->
-<!--        android:layout_width="0dp"-->
-<!--        android:layout_height="0dp"-->
-<!--        android:divider="@android:color/darker_gray"-->
-<!--        android:dividerHeight="1dp"-->
-<!--        app:layout_constraintTop_toBottomOf="@id/bannerImage"-->
-<!--        app:layout_constraintBottom_toBottomOf="parent"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintEnd_toEndOf="parent" />-->
+    <!-- RecyclerView nằm sau banner -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:clipToPadding="false"
         android:padding="8dp"
+        android:clipToPadding="false"
         app:layout_constraintTop_toBottomOf="@id/bannerImage"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"

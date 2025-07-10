@@ -5,30 +5,29 @@
     android:padding="16dp"
     android:background="#FFFFFF">
 
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
+
         <ImageButton
             android:id="@+id/btnBackCart"
             android:layout_width="36dp"
             android:layout_height="36dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_back"
-            android:tint="#000000"
-            android:contentDescription="Quay lại trang chi gio hàng" />
-        <!-- Tiêu đề -->
+            android:tint="#000000" />
+
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Tổng quan đơn hàng"
-            android:textSize="24sp"
+            android:textSize="22sp"
             android:textStyle="bold"
-            android:layout_gravity="center_horizontal"
-            android:paddingBottom="16dp" />
+            android:gravity="center"
+            android:paddingVertical="16dp" />
 
-        <!-- Địa chỉ giao hàng + nút chỉnh sửa -->
+        <!-- Địa chỉ -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -39,92 +38,79 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Địa chỉ giao hàng:"
-                android:textStyle="bold" />
+                android:text="Địa chỉ:"
+                android:textStyle="bold"
+                android:textSize="16sp" />
 
-            <Button
+            <TextView
+                android:id="@+id/tvAddress"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:padding="8dp"
+                android:layout_marginStart="8dp"
+                android:background="#EEEEEE"
+                android:text="Chưa nhập"
+                android:textSize="14sp" />
+
+            <TextView
                 android:id="@+id/btnEditAddress"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Chỉnh sửa"
-                android:layout_marginStart="16dp"
-                android:textSize="14sp" />
+                android:text="✎"
+                android:textColor="#007BFF"
+                android:textSize="16sp"
+                android:padding="6dp"
+                android:layout_marginStart="8dp" />
         </LinearLayout>
 
-        <TextView
-            android:id="@+id/tvAddress"
+        <!-- Danh sách sản phẩm -->
+        <LinearLayout
+            android:id="@+id/productListLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Chưa nhập"
-            android:padding="8dp"
-            android:background="#EEEEEE"
+            android:orientation="vertical"
+            android:divider="?android:attr/dividerHorizontal"
+            android:showDividers="middle"
             android:layout_marginBottom="16dp" />
 
-        <!-- Ảnh sản phẩm -->
-        <ImageView
-            android:id="@+id/imgProduct"
-            android:layout_width="150dp"
-            android:layout_height="150dp"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="16dp"
-            android:src="@drawable/banner_sample" />
-
-        <!-- Tên sản phẩm -->
-        <TextView
-            android:id="@+id/tvProductName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Tên sản phẩm"
-            android:textSize="18sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/tvQuantity"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Số lượng: 1" />
-
-        <TextView
-            android:id="@+id/tvPrice"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Giá: 0đ"
-            android:layout_marginBottom="16dp" />
-
-        <!-- Tổng tiền -->
+        <!-- Tổng kết -->
         <TextView
             android:id="@+id/tvSubtotal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Tạm tính: 0đ" />
+            android:text="Tạm tính: $0.00"
+            android:textSize="14sp" />
 
         <TextView
             android:id="@+id/tvShipping"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Phí vận chuyển: 0đ" />
+            android:text="Phí vận chuyển: Free"
+            android:textSize="14sp" />
 
         <TextView
             android:id="@+id/tvTotal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Tổng cộng: 0đ"
-            android:textSize="18sp"
+            android:text="Tổng cộng: $0.00"
+            android:textSize="16sp"
             android:textStyle="bold"
-            android:padding="8dp"
+            android:padding="10dp"
             android:background="#FFF2CC"
             android:layout_marginTop="8dp"
             android:gravity="end" />
 
-        <!-- Nút đặt hàng -->
         <Button
             android:id="@+id/btnPlaceOrder"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Đặt hàng"
-            android:layout_marginTop="24dp"
+            android:textAllCaps="false"
+            android:textStyle="bold"
             android:backgroundTint="#FF5722"
             android:textColor="#FFFFFF"
-            android:textStyle="bold" />
+            android:layout_marginTop="24dp"
+            android:padding="12dp" />
     </LinearLayout>
 </ScrollView>

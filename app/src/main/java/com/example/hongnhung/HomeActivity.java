@@ -15,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -38,6 +39,7 @@ public class HomeActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private List<products> sanPhamList;
     private productAdapter productAdapter;
+    private List<products> sanPhamListFull = new ArrayList<>();
 
     private final String url = "https://fakestoreapi.com/products";
 
@@ -62,8 +64,8 @@ public class HomeActivity extends AppCompatActivity {
         etSearch = findViewById(R.id.etSearch);
         recyclerView = findViewById(R.id.recyclerView);
 
-        // Khởi tạo RecyclerView
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        recyclerView.setLayoutManager(new GridLayoutManager(this, 2)); // 2 sản phẩm mỗi hàng
         productAdapter = new productAdapter(this, sanPhamList);
         recyclerView.setAdapter(productAdapter);
 
@@ -71,11 +73,19 @@ public class HomeActivity extends AppCompatActivity {
         loadSanPham();
 
         // Xử lý tìm kiếm
-        etSearch.setOnEditorActionListener((v, actionId, event) -> {
-            String query = etSearch.getText().toString();
-            Toast.makeText(this, "Đang tìm: " + query, Toast.LENGTH_SHORT).show();
-            return true;
+        etSearch.addTextChangedListener(new android.text.TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                filterSanPham(s.toString());
+            }
+
+            @Override
+            public void afterTextChanged(android.text.Editable s) {}
         });
+
 
         // Sự kiện chuyển trang
         btnProfile.setOnClickListener(v -> startActivity(new Intent(this, ProfileActivity.class)));
@@ -98,6 +108,7 @@ public class HomeActivity extends AppCompatActivity {
                                     obj.getString("image")
                             );
                             sanPhamList.add(sp);
+                            sanPhamListFull.add(sp);
                         } catch (JSONException e) {
                             Log.e("JSON_ERROR", e.getMessage());
                         }
@@ -128,4 +139,18 @@ public class HomeActivity extends AppCompatActivity {
             tvCartCount.setVisibility(View.GONE);
         }
     }
+    private void filterSanPham(String keyword) {
+        sanPhamList.clear();
+        if (keyword.isEmpty()) {
+            sanPhamList.addAll(sanPhamListFull);
+        } else {
+            for (products sp : sanPhamListFull) {
+                if (sp.getTitle().toLowerCase().contains(keyword.toLowerCase())) {
+                    sanPhamList.add(sp);
+                }
+            }
+        }
+        productAdapter.notifyDataSetChanged();
+    }
+
 }

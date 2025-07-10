@@ -52,7 +52,6 @@ public class CartActivity extends AppCompatActivity {
         });
 
 
-
         // Adapter
         adapter = new CartAdapter(this, cartItems, this::updateSummary);
         rvCartItems.setAdapter(adapter);
@@ -79,21 +78,38 @@ public class CartActivity extends AppCompatActivity {
 
     }
 
+    //    private void updateSummary() {
+//        int subtotal = 0;
+//        for (CartItem item : cartItems) {
+//            try {
+//                int priceInt = Integer.parseInt(item.getPrice().replace("đ", "").replace(".", "").trim());
+//                subtotal += priceInt * item.getQuantity();
+//            } catch (NumberFormatException e) {
+//                e.printStackTrace();
+//            }
+//        }
+    private double parsePrice(String priceString) {
+        try {
+            priceString = priceString.replaceAll("[^\\d.]", "");
+            return Double.parseDouble(priceString);
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
     private void updateSummary() {
-        int subtotal = 0;
+        double subtotal = 0;
         for (CartItem item : cartItems) {
-            try {
-                int priceInt = Integer.parseInt(item.getPrice().replace("đ", "").replace(".", "").trim());
-                subtotal += priceInt * item.getQuantity();
-            } catch (NumberFormatException e) {
-                e.printStackTrace();
-            }
+            subtotal += parsePrice(item.getPrice()) * item.getQuantity();
         }
 
-        tvSubtotal.setText("Tạm tính: " + subtotal + "đ");
-        tvShippingFee.setText("Phí vận chuyển: " + SHIPPING_FEE + "đ");
-        tvDiscount.setText("Giảm giá: " + DISCOUNT + "đ");
-        tvTotal.setText("Tổng cộng: " + (subtotal + SHIPPING_FEE - DISCOUNT) + "đ");
+        tvSubtotal.setText("Tạm tính: $" + String.format("%.2f", subtotal));
+        tvShippingFee.setText("Phí vận chuyển: Free");
+        tvDiscount.setText("Giảm giá: $0.00");
+
+        double total = subtotal; // vì freeship, no discount
+        tvTotal.setText("Tổng cộng: $" + String.format("%.2f", total));
     }
 
 }
